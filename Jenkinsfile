@@ -4,7 +4,7 @@ pipeline {
     environment {
         APP_NAME = "register-app-pipeline"
         IMAGE_TAG = "v1.0.0" // Can be parameterized
-        GIT_REPO = "https://github.com/Manjesh501/gitops-register-app.git"
+        GIT_REPO = "https://github.com/Manjesh501/gitops-register-app"
         GIT_BRANCH = "main"
     }
 
@@ -44,7 +44,7 @@ pipeline {
                         git config user.email "manjesht78@gmail.com"
                         git add deployment.yaml
                         git commit -m "Update image tag to ${IMAGE_TAG}" || echo "No changes to commit"
-                        git push https://Manjesh501:${GITHUB_PAT}@github.com/Manjesh501/gitops-register-app.git HEAD:${GIT_BRANCH}
+                        git push https://Manjesh501:${GITHUB_PAT}@github.com/Manjesh501/gitops-register-app HEAD:${GIT_BRANCH}
                     """
                 }
             }
