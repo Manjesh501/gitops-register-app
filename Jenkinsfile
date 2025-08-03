@@ -3,7 +3,9 @@ pipeline {
 
     environment {
         APP_NAME = "register-app-pipeline"
-        IMAGE_TAG = "v1.0.0" // Or pass it as parameter
+        IMAGE_TAG = "v1.0.0" // Can be parameterized
+        GIT_REPO = "https://github.com/Manjesh501/gitops-register-app.git"
+        GIT_BRANCH = "main"
     }
 
     stages {
@@ -13,9 +15,10 @@ pipeline {
             }
         }
 
-        stage("Checkout from SCM") {
+        stage("Checkout from GitHub") {
             steps {
-                git branch: 'main', credentialsId: 'github', url: 'https://github.com/Manjesh501/gitops-register-app'
+                // This uses GitHub checkout WITHOUT credentials
+                git branch: "${GIT_BRANCH}", url: "${GIT_REPO}"
             }
         }
 
@@ -26,22 +29,22 @@ pipeline {
                     cat deployment.yaml
 
                     sed -i "s|${APP_NAME}:.*|${APP_NAME}:${IMAGE_TAG}|g" deployment.yaml
-                    
+
                     echo "After change:"
                     cat deployment.yaml
                 """
             }
         }
 
-        stage("Commit and Push to GitHub") {
+        stage("Commit and Push Changes") {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                withCredentials([string(credentialsId: 'github_pat_token', variable: 'GITHUB_PAT')]) {
                     sh """
-                        git config user.name "${GIT_USERNAME}"
+                        git config user.name "Manjesh Tiwari"
                         git config user.email "manjesht78@gmail.com"
                         git add deployment.yaml
-                        git commit -m "Updated Deployment Manifest with image tag ${IMAGE_TAG}" || echo "No changes to commit"
-                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/Manjesh501/gitops-register-app.git HEAD:main
+                        git commit -m "Update image tag to ${IMAGE_TAG}" || echo "No changes to commit"
+                        git push https://Manjesh501:${GITHUB_PAT}@github.com/Manjesh501/gitops-register-app.git HEAD:${GIT_BRANCH}
                     """
                 }
             }
