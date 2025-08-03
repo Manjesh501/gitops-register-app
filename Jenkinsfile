@@ -17,7 +17,6 @@ pipeline {
 
         stage("Checkout from GitHub") {
             steps {
-                // This uses GitHub checkout WITHOUT credentials
                 git branch: "${GIT_BRANCH}", url: "${GIT_REPO}"
             }
         }
@@ -33,20 +32,6 @@ pipeline {
                     echo "After change:"
                     cat deployment.yaml
                 """
-            }
-        }
-
-        stage("Commit and Push Changes") {
-            steps {
-                withCredentials([string(credentialsId: 'github_pat_token', variable: 'GITHUB_PAT')]) {
-                    sh """
-                        git config user.name "Manjesh Tiwari"
-                        git config user.email "manjesht78@gmail.com"
-                        git add deployment.yaml
-                        git commit -m "Update image tag to ${IMAGE_TAG}" || echo "No changes to commit"
-                        git push https://Manjesh501:${GITHUB_PAT}@github.com/Manjesh501/gitops-register-app HEAD:${GIT_BRANCH}
-                    """
-                }
             }
         }
     }
